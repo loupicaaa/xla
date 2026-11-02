@@ -1469,6 +1469,61 @@ xla_test(
     ]),
 )
 
+cuda_library(
+    name = "collective_sm_stall_kernels",
+    testonly = True,
+    srcs = ["collective_sm_stall_kernels.cu.cc"],
+    hdrs = ["collective_sm_stall_kernels.h"],
+    tags = [
+        "cuda-only",
+        "gpu",
+    ],
+    deps = [
+        "//xla/stream_executor/cuda:cuda_status",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/status:status_macros",
+        "@com_google_absl//absl/status:statusor",
+        "@local_config_cuda//cuda:cuda_runtime",
+    ],
+)
+
+xla_test(
+    name = "collective_sm_stall_test",
+    srcs = ["collective_sm_stall_test.cc"],
+    backend_tags = {
+        "gpu": [
+            "multi_gpu",
+        ],
+    },
+    backends = ["gpu"],
+    tags = ["cuda-only"],
+    deps = [
+        ":collective_ops_e2e_test_base",
+        ":collective_sm_stall_kernels",
+        "//xla:literal",
+        "//xla:literal_util",
+        "//xla:xla_proto_cc",
+        "//xla/backends/gpu:ffi",
+        "//xla/ffi",
+        "//xla/ffi:ffi_api",
+        "//xla/service:hlo_module_config",
+        "//xla/stream_executor:stream",
+        "//xla/stream_executor:stream_executor_h",
+        "//xla/tests:literal_test_util",
+        "//xla/tests:xla_internal_test_main",
+        "//xla/tsl/platform:test",
+        "@com_google_absl//absl/log:check",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/status:status_macros",
+        "@com_google_absl//absl/status:statusor",
+        "@com_google_absl//absl/strings",
+        "@com_google_absl//absl/strings:string_view",
+        "@com_google_absl//absl/synchronization",
+        "@com_google_absl//absl/time",
+        "@com_google_googletest//:gtest",
+    ],
+)
+
 xla_test(
     name = "collective_ops_sharded_unsharded_e2e_test",
     srcs = ["collective_ops_sharded_unsharded_e2e_test.cc"],
